@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>➕➖✖️➗</title>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        button i {
+            margin-right: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        #timer {
+            margin-top: 10px;
+            font-size: 14px;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Math Game</h2>
+	
+		 <h3><span id="num1">0</span> <span id="operator">+</span> <span id="num2">0</span> = ?</h3>
+        <input type="number" id="answer" placeholder="Enter your answer">
+        <button id="submit"><i class="fas fa-check"></i> Submit</button>
+		       
+        <p id="result"></p>
+        <p id="timer">Time: 0s</p>
+		 <button id="show-answer"><i class="fas fa-eye"></i> Show Answer</button>
+        <button id="regenerate"><i class="fas fa-sync-alt"></i> Regenerate</button>
+		<hr/>
+        <label for="level">Select Level:</label>
+        <select id="level">
+            <option value="1">1 Digit</option>
+            <option value="2">2 Digits</option>
+            <option value="3">3 Digits</option>
+            <option value="4">4 Digits</option>
+            <option value="5">5 Digits</option>
+            <option value="random">Random Digits</option>
+        </select>
+        <label for="operation">Select Operation:</label>
+        <select id="operation">
+            <option value="+">Addition</option>
+            <option value="-">Subtraction</option>
+            <option value="*">Multiplication</option>
+            <option value="/">Division</option>
+        </select>
+       
+
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const num1Element = document.getElementById("num1");
+            const num2Element = document.getElementById("num2");
+            const operatorElement = document.getElementById("operator");
+            const userInput = document.getElementById("answer");
+            const submitButton = document.getElementById("submit");
+            const showAnswerButton = document.getElementById("show-answer");
+            const regenerateButton = document.getElementById("regenerate");
+            const resultElement = document.getElementById("result");
+            const levelSelect = document.getElementById("level");
+            const operationSelect = document.getElementById("operation");
+            const timerElement = document.getElementById("timer");
+            let num1, num2, correctAnswer, timer, startTime;
+//---title
+            const titleVariants = ["➕➖✖️➗", "➖✖️➗➕", "✖️➗➕➖", "➗➕➖✖️"];
+let titleIndex = 0;
+
+function updateTitle() {
+    document.title = titleVariants[titleIndex];
+    titleIndex = (titleIndex + 1) % titleVariants.length;
+}
+setInterval(updateTitle, 500);
+//----title End
+            function getMaxNumber(level) {
+                switch (level) {
+                    case "1": return [9, 9];
+                    case "2": return [99, 99];
+                    case "3": return [999, 999];
+                    case "4": return [9999, 9999];
+                    case "5": return [99999, 99999];
+                    case "random": return [
+                        Math.pow(10, Math.floor(Math.random() * 5) + 1) - 1,
+                        Math.pow(10, Math.floor(Math.random() * 5) + 1) - 1
+                    ];
+                    default: return [9, 9];
+                }
+            }
+
+            function startTimer() {
+                startTime = Date.now();
+                clearInterval(timer);
+                timer = setInterval(() => {
+                    const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+                    timerElement.textContent = `Time: ${elapsedTime}s`;
+                }, 1000);
+            }
+
+            function generateNumbers() {
+                const [max1, max2] = getMaxNumber(levelSelect.value);
+                num1 = Math.floor(Math.random() * max1) + 1;
+                num2 = Math.floor(Math.random() * max2) + 1;
+                const operation = operationSelect.value;
+                operatorElement.textContent = operation;
+                
+                switch (operation) {
+                    case "-": correctAnswer = num1 - num2; break;
+                    case "*": correctAnswer = num1 * num2; break;
+                    case "/":
+                        num1 = num1 * num2; 
+                        correctAnswer = num1 / num2;
+                        break;
+                    default: correctAnswer = num1 + num2;
+                }
+                
+                num1Element.textContent = num1;
+                num2Element.textContent = num2;
+                userInput.value = "";
+                resultElement.textContent = "";
+                userInput.focus();
+                startTimer();
+            }
+
+            submitButton.addEventListener("click", function () {
+                const userAnswer = parseFloat(userInput.value);
+                if (userAnswer === correctAnswer) {
+				generateNumbers();
+                    resultElement.textContent = "Correct! 🎉";
+                    resultElement.style.color = "green";
+                    
+					
+                } else {
+                    resultElement.textContent = "Wrong! Try again.";
+                    resultElement.style.color = "red";
+                    userInput.value = "";
+                    userInput.focus();
+                }
+            });
+
+            showAnswerButton.addEventListener("click", function () {
+                resultElement.textContent = `Answer: ${correctAnswer}`;
+                resultElement.style.color = "blue";
+            });
+
+            regenerateButton.addEventListener("click", generateNumbers);
+
+            userInput.addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    submitButton.click();
+                }
+            });
+
+            levelSelect.addEventListener("change", generateNumbers);
+            operationSelect.addEventListener("change", generateNumbers);
+            
+            generateNumbers();
+        });
+    </script>
+</body>
+</html>
